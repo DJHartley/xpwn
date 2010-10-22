@@ -17,6 +17,7 @@
 #define IMG3_CERT_MAGIC 0x43455254
 #define IMG3_KBAG_MAGIC 0x4B424147
 #define IMG3_TYPE_MAGIC 0x54595045
+#define IMG3_ECID_MAGIC 0x45434944
 
 #define IMG3_SIGNATURE IMG3_MAGIC
 
@@ -64,6 +65,8 @@ struct Img3Info {
 	Img3Element* cert;
 	Img3Element* kbag;
 	Img3Element* type;
+	Img3Element* shsh;
+	Img3Element* ecid;
 	int encrypted;
 	AES_KEY encryptKey;
 	AES_KEY decryptKey;
@@ -73,6 +76,7 @@ struct Img3Info {
 	char dirty;
 	char exploit24k;
 	char exploitN8824k;
+	char decryptLast;
 };
 
 #ifdef __cplusplus
@@ -81,6 +85,7 @@ extern "C" {
 	AbstractFile* createAbstractFileFromImg3(AbstractFile* file);
 	AbstractFile* duplicateImg3File(AbstractFile* file, AbstractFile* backing);
 	void replaceCertificateImg3(AbstractFile* file, AbstractFile* certificate);
+	void replaceSignatureImg3(AbstractFile* file, AbstractFile* signature);
 	void exploit24kpwn(AbstractFile* file);
 	void exploitN8824kpwn(AbstractFile* file);
 #ifdef __cplusplus

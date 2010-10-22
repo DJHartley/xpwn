@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>FilesystemPatches</key>
+	<dict>
+		<key>Core Files Installation</key>
+		<array>
+			<dict>
+				<key>Action</key>
+				<string>ReplaceKernel</string>
+				<key>File</key>
+				<string>kernelcache.release.s5l8922x</string>
+				<key>Name</key>
+				<string>KernelCache</string>
+				<key>Path</key>
+				<string>System/Library/Caches/com.apple.kernelcaches/kernelcache.s5l8922x</string>
+			</dict>
+		</array>
+		<key>Filesystem Jailbreak</key>
+		<array>
+			<dict>
+				<key>Action</key>
+				<string>Patch</string>
+				<key>File</key>
+				<string>etc/fstab</string>
+				<key>Name</key>
+				<string>Filesystem Write Access</string>
+				<key>Patch</key>
+				<string>fstab.patch</string>
+			</dict>
+			<dict>
+				<key>Action</key>
+				<string>Patch</string>
+				<key>File</key>
+				<string>System/Library/Lockdown/Services.plist</string>
+				<key>Name</key>
+				<string>Apple File Connection v2</string>
+				<key>Patch</key>
+				<string>Services.patch</string>
+			</dict>
+		</array>
+	</dict>
+	<key>FirmwarePatches</key>
+	<dict>
+		<key>iBEC</key>
+		<dict>
+			<key>File</key>
+			<string>Firmware/dfu/iBEC.n18ap.RELEASE.dfu</string>
+			<key>IV</key>
+			<string>bb9c1a821f702ef3a0594c635095ae2c</string>
+			<key>Key</key>
+			<string>c281fa655aa3fbbda277c387b762dc83b7850e4d653d519159b14616a81b436f</string>
+			
+			<key>Patch</key>
+			<string>iBEC.n18ap.RELEASE.patch</string>
+			
+			<key>TypeFlag</key>
+			<integer>8</integer>
+		</dict>
+		<key>KernelCache</key>
+		<dict>
+			<key>File</key>
+			<string>kernelcache.release.s5l8922x</string>
+			<key>IV</key>
+			<string>5152a642caf5826d5ec2a41a3f534a28</string>
+			<key>Key</key>
+			<string>2a2fe89a63cf9f58f8b9af2337eaea7df0a53f9c063b3460f04ec08e9eaa44ab</string>
+			
+			<key>Patch</key>
+			<string>kernelcache.release.patch</string>
+			
+			<key>TypeFlag</key>
+			<integer>4</integer>
+		</dict>
+		<key>Restore Ramdisk</key>
+		<dict>
+			<key>File</key>
+			<string>018-6513-015.dmg</string>	
+			<key>IV</key>
+			<string>ed40b5cf7bc9f3eb2db62b8f11d86a7d</string>
+			<key>Key</key>
+			<string>4ef57007bebb68849b715bfdf37d53d73192b1f5c2228947268c1deb4cad689d</string>
+			<key>TypeFlag</key>
+			<integer>8</integer>
+		</dict>
+	</dict>
+	<key>RamdiskPatches</key>
+	<dict>
+		<key>asr</key>
+		<dict>
+			<key>File</key>
+			<string>usr/sbin/asr</string>
+			<key>Patch</key>
+			<string>asr.patch</string>
+		</dict>
+	</dict>
+	<key>PreInstalledPackages</key>
+	<array>
+		<string>org.saurik.cydia</string>
+	</array>
+	<key>RestoreRamdiskMountVolume</key>
+	<string>ramdisk</string>
+	<key>RootFilesystem</key>
+	<string>018-6522-015.dmg</string>
+	<key>RootFilesystemSize</key>
+	<integer>600</integer>
+	<key>RootFilesystemKey</key>
+	<string>1402974cba4702e831fb821ef9090229f7bad6fd3084fa99bfc8a76de4d839f9bf4533eb</string>
+	<key>RootFilesystemMountVolume</key>
+	<string>SUNorthstarTwo7E18.N18OS</string>
+	<key>SHA1</key>
+	<string>375fd469b18bfc0b74c7cfa5b4d5945197b1d106</string>
+	<key>Filename</key>
+	<string>iPod3,1_3.1.3_7E18_Restore.ipsw</string>
+	<key>Name</key>
+	<string>iPod3,1_3.1.3_7E18</string>
+	<key>DownloadUrl</key>
+	<string>http://appldnld.apple.com.edgesuite.net/content.info.apple.com/iPhone/061-7473.20100202.4i44t/iPod3,1_3.1.3_7E18_Restore.ipsw</string>
+	<key>Platform</key>
+	<integer>5</integer>
+	<key>SubPlatform</key>
+	<integer>7</integer>
+</dict>
+</plist>
