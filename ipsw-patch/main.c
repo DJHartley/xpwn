@@ -257,21 +257,21 @@ int main(int argc, char* argv[]) {
 		exit(1);
 	}
 
-	firmwarePatches = (Dictionary*)getValueByKey(info, "FilesystemPatches");
+	firmwarePatches = (Dictionary*)dictionary_get_key(info, "FilesystemPatches");
 
 	int j;
 	for(j = 0; j < numToRemove; j++) {
-		removeKey(firmwarePatches, argv[toRemove[j]]);
+		dictionary_remove_key(firmwarePatches, argv[toRemove[j]]);
 	}
 	free(toRemove);
 
-	firmwarePatches = (Dictionary*)getValueByKey(info, "FirmwarePatches");
+	firmwarePatches = (Dictionary*)dictionary_get_key(info, "FirmwarePatches");
 	patchDict = (Dictionary*) firmwarePatches->values;
 	while(patchDict != NULL) {
-		fileValue = (StringValue*) getValueByKey(patchDict, "File");
+		fileValue = (StringValue*) dictionary_get_key(patchDict, "File");
 
-		StringValue* keyValue = (StringValue*) getValueByKey(patchDict, "Key");
-		StringValue* ivValue = (StringValue*) getValueByKey(patchDict, "IV");
+		StringValue* keyValue = (StringValue*) dictionary_get_key(patchDict, "Key");
+		StringValue* ivValue = (StringValue*) dictionary_get_key(patchDict, "IV");
 		pKey = NULL;
 		pIV = NULL;
 
@@ -292,7 +292,7 @@ int main(int argc, char* argv[]) {
 			pIV = iv;
 		}
 
-		BoolValue *isPlainValue = (BoolValue *)getValueByKey(patchDict, "IsPlain");
+		BoolValue *isPlainValue = (BoolValue *)dictionary_get_key(patchDict, "IsPlain");
 		int isPlain = (isPlainValue && isPlainValue->value);
 
 		if(strcmp(patchDict->dValue.key, "Restore Ramdisk") == 0) {
@@ -312,7 +312,7 @@ int main(int argc, char* argv[]) {
 			updateRamdiskFSPathInIPSW = fileValue->value;
 		}
 
-		patchValue = (StringValue*) getValueByKey(patchDict, "Patch2");
+		patchValue = (StringValue*) dictionary_get_key(patchDict, "Patch2");
 		if(patchValue) {
 			if(noWipe) {
 				XLOG(0, "%s: ", patchDict->dValue.key); fflush(stdout);
@@ -322,7 +322,7 @@ int main(int argc, char* argv[]) {
 			}
 		}
 
-		patchValue = (StringValue*) getValueByKey(patchDict, "Patch");
+		patchValue = (StringValue*) dictionary_get_key(patchDict, "Patch");
 		if(patchValue) {
 			XLOG(0, "%s: ", patchDict->dValue.key); fflush(stdout);
 			doPatch(patchValue, fileValue, bundlePath, &outputState, pKey, pIV, useMemory, isPlain);
@@ -343,10 +343,10 @@ int main(int argc, char* argv[]) {
 		patchDict = (Dictionary*) patchDict->dValue.next;
 	}
 
-	fileValue = (StringValue*) getValueByKey(info, "RootFilesystem");
+	fileValue = (StringValue*) dictionary_get_key(info, "RootFilesystem");
 	rootFSPathInIPSW = fileValue->value;
 
-	size_t defaultRootSize = ((IntegerValue*) getValueByKey(info, "RootFilesystemSize"))->value;
+	size_t defaultRootSize = ((IntegerValue*) dictionary_get_key(info, "RootFilesystemSize"))->value;
 	minimumRootSize = defaultRootSize * 1000 * 1000;
 	minimumRootSize -= minimumRootSize % 512;
 
@@ -368,7 +368,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	extractDmg(
-		createAbstractFileFromFileVault(getFileFromOutputState(&outputState, rootFSPathInIPSW), ((StringValue*)getValueByKey(info, "RootFilesystemKey"))->value),
+		createAbstractFileFromFileVault(getFileFromOutputState(&outputState, rootFSPathInIPSW), ((StringValue*)dictionary_get_key(info, "RootFilesystemKey"))->value),
 		openRoot((void**)&buffer, &rootSize), -1);
 
 	
@@ -381,20 +381,20 @@ int main(int argc, char* argv[]) {
 		grow_hfs(rootVolume, rootSize);
 	}
 	
-	firmwarePatches = (Dictionary*)getValueByKey(info, "FilesystemPatches");
+	firmwarePatches = (Dictionary*)dictionary_get_key(info, "FilesystemPatches");
 	patchArray = (ArrayValue*) firmwarePatches->values;
 	while(patchArray != NULL) {
 		for(i = 0; i < patchArray->size; i++) {
 			patchDict = (Dictionary*) patchArray->values[i];
-			fileValue = (StringValue*) getValueByKey(patchDict, "File");
+			fileValue = (StringValue*) dictionary_get_key(patchDict, "File");
 					
-			actionValue = (StringValue*) getValueByKey(patchDict, "Action"); 
+			actionValue = (StringValue*) dictionary_get_key(patchDict, "Action"); 
 			if(strcmp(actionValue->value, "ReplaceKernel") == 0) {
-				pathValue = (StringValue*) getValueByKey(patchDict, "Path");
+				pathValue = (StringValue*) dictionary_get_key(patchDict, "Path");
 				XLOG(0, "replacing kernel... %s -> %s\n", fileValue->value, pathValue->value); fflush(stdout);
 				add_hfs(rootVolume, getFileFromOutputState(&outputState, fileValue->value), pathValue->value);
 			} if(strcmp(actionValue->value, "Patch") == 0) {
-				patchValue = (StringValue*) getValueByKey(patchDict, "Patch");
+				patchValue = (StringValue*) dictionary_get_key(patchDict, "Patch");
 				patchPath = (char*) malloc(sizeof(char) * (strlen(bundlePath) + strlen(patchValue->value) + 2));
 				strcpy(patchPath, bundlePath);
 				strcat(patchPath, "/");
@@ -434,12 +434,12 @@ int main(int argc, char* argv[]) {
 	
 	/* Apply Ramdisk Patches */
 	XLOG(0, "patching ramdisk\n");
-	firmwarePatches = (Dictionary*)getValueByKey(info, "RamdiskPatches");
+	firmwarePatches = (Dictionary*)dictionary_get_key(info, "RamdiskPatches");
 	patchDict = (Dictionary*) firmwarePatches->values;
 	while(patchDict != NULL) {
-		fileValue = (StringValue*) getValueByKey(patchDict, "File");
+		fileValue = (StringValue*) dictionary_get_key(patchDict, "File");
 					
-		patchValue = (StringValue*) getValueByKey(patchDict, "Patch");
+		patchValue = (StringValue*) dictionary_get_key(patchDict, "Patch");
 		patchPath = (char*) malloc(sizeof(char) * (strlen(bundlePath) + strlen(patchValue->value) + 2));
 		strcpy(patchPath, bundlePath);
 		strcat(patchPath, "/");
@@ -453,17 +453,17 @@ int main(int argc, char* argv[]) {
 	}
 	
 	if(doBootNeuter) {
-		firmwarePatches = (Dictionary*)getValueByKey(info, "BasebandPatches");
+		firmwarePatches = (Dictionary*)dictionary_get_key(info, "BasebandPatches");
 		if(firmwarePatches != NULL) {
 			patchDict = (Dictionary*) firmwarePatches->values;
 			while(patchDict != NULL) {
-				pathValue = (StringValue*) getValueByKey(patchDict, "Path");
+				pathValue = (StringValue*) dictionary_get_key(patchDict, "Path");
 
-				fileValue = (StringValue*) getValueByKey(patchDict, "File");		
+				fileValue = (StringValue*) dictionary_get_key(patchDict, "File");		
 				if(fileValue) {
 					XLOG(0, "copying %s -> %s... ", fileValue->value, pathValue->value); fflush(stdout);
 					if(copyAcrossVolumes(ramdiskVolume, rootVolume, fileValue->value, pathValue->value)) {
-						patchValue = (StringValue*) getValueByKey(patchDict, "Patch");
+						patchValue = (StringValue*) dictionary_get_key(patchDict, "Patch");
 						if(patchValue) {
 							patchPath = malloc(sizeof(char) * (strlen(bundlePath) + strlen(patchValue->value) + 2));
 							strcpy(patchPath, bundlePath);
@@ -507,7 +507,7 @@ int main(int argc, char* argv[]) {
 
 	writeOutput(&outputState, outputIPSW);
 	
-	releaseDictionary(info);
+	dictionary_free(info);
 
 	free(bundlePath);
 	

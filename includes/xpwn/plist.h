@@ -9,8 +9,7 @@ enum DictTypes {
 	StringType,
 	DataType,
 	IntegerType,
-	BoolType,
-	DataType
+	BoolType
 };
 
 typedef struct DictValue {
@@ -60,23 +59,23 @@ typedef struct Tag {
 #ifdef __cplusplus
 extern "C" {
 #endif
-	void createArray(ArrayValue* myself, char* xml);
-	void createDictionary(Dictionary* myself, char* xml);
-	Dictionary* createDictionaryFromAbstractFile(AbstractFile* file);
-	void releaseArray(ArrayValue* myself);
-	void releaseDictionary(Dictionary* myself);
-	char* getXmlFromArrayValue(ArrayValue* myself, int tabsCount);
-	char* getXmlFromDictionary(Dictionary* myself, int tabsCount);
-	Dictionary* createRoot(char* xml);
-	char* getXmlFromRoot(Dictionary* root);
-	DictValue* getValueByKey(Dictionary* myself, const char* key);
-	void addStringToArray(ArrayValue* array, char* str);
-	void removeKey(Dictionary* dict, char* key);
-	void addStringToDictionary(Dictionary* dict, const char* key, const char* value);
-	void addDataToDictionary(Dictionary* dict, const char* key, const char* value);
-	void addBoolToDictionary(Dictionary* dict, const char* key, int value);
-	void addIntegerToDictionary(Dictionary* dict, const char* key, int value);
-	void addValueToDictionary(Dictionary* dict, const char* key, DictValue* value);
+	void array_new(ArrayValue* myself, char* xml);
+	void dictionary_new(Dictionary* myself, char* xml);
+	Dictionary* dictionary_newFromAbstractFile(AbstractFile* file);
+	void array_free(ArrayValue* myself);
+	void dictionary_free(Dictionary* myself);
+	char* array_to_xml(ArrayValue* myself, int tabsCount);
+	char* dictionary_to_xml(Dictionary* myself, int tabsCount);
+	Dictionary* root_from_file(char* xml);
+	char* root_to_xml(Dictionary* root);
+	DictValue* dictionary_get_key(Dictionary* myself, const char* key);
+	void array_add_string(ArrayValue* array, char* str);
+	void dictionary_remove_key(Dictionary* dict, char* key);
+	void dictionary_add_string(Dictionary* dict, const char* key, const char* value);
+	void dictionary_add_data(Dictionary* dict, const char* key, const char* value);
+	void dictionary_add_bool(Dictionary* dict, const char* key, int value);
+	void dictionary_add_integer(Dictionary* dict, const char* key, int value);
+	void dictionary_add_value(Dictionary* dict, const char* key, DictValue* value);
 #ifdef __cplusplus
 }
 #endif

@@ -157,17 +157,17 @@ int main(int argc, const char *argv[]) {
 
 	buffer[file_len] = '\0';
 
-	Dictionary* info = createRoot(buffer);
+	Dictionary* info = root_from_file(buffer);
 	assert(info != NULL);
 	free(buffer);
 
-	Dictionary* zephyr1FW = (Dictionary*) getValueByKey(info, "Z1F50,1");
+	Dictionary* zephyr1FW = (Dictionary*) dictionary_get_key(info, "Z1F50,1");
 	if(zephyr1FW)
 	{
-		DataValue* aspeedData = (DataValue*) getValueByKey(zephyr1FW, "A-Speed Firmware");
+		DataValue* aspeedData = (DataValue*) dictionary_get_key(zephyr1FW, "A-Speed Firmware");
 		assert(aspeedData != NULL);
 
-		DataValue* fwData = (DataValue*) getValueByKey(zephyr1FW, "Firmware");
+		DataValue* fwData = (DataValue*) dictionary_get_key(zephyr1FW, "Firmware");
 		assert(fwData != NULL);
 
 		output = fopen("zephyr_aspeed.bin", "wb");
@@ -181,10 +181,10 @@ int main(int argc, const char *argv[]) {
 		fclose(output);
 	}
 
-	Dictionary* zephyr2FW = (Dictionary*) getValueByKey(info, "Z2F52,1");
+	Dictionary* zephyr2FW = (Dictionary*) dictionary_get_key(info, "Z2F52,1");
 	if(zephyr2FW)
 	{
-		DataValue* fwData = (DataValue*) getValueByKey(zephyr2FW, "Constructed Firmware");
+		DataValue* fwData = (DataValue*) dictionary_get_key(zephyr2FW, "Constructed Firmware");
 		assert(fwData != NULL);
 
 		output = fopen("zephyr2.bin", "wb");

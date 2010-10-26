@@ -81,14 +81,14 @@ char* createTssRequest(char* ecid_string, char* input_ipsw) {
     return NULL;
   }
 
-  Dictionary* root = createDictionaryFromAbstractFile(file);
+  Dictionary* root = dictionary_newFromAbstractFile(file);
   if (root == NULL) {
     fprintf(stderr, "Unable to create dictionary from build manifest\n");
     return NULL;
   }
 
   // Pull device information out of manifest.
-  ArrayValue* identities = (ArrayValue*) getValueByKey(root, "BuildIdentities");
+  ArrayValue* identities = (ArrayValue*) dictionary_get_key(root, "BuildIdentities");
   if (identities == NULL) {
     fprintf(stderr, "Unable to find build identities\n");
     return NULL;
@@ -100,13 +100,13 @@ char* createTssRequest(char* ecid_string, char* input_ipsw) {
     return NULL;
   }
 
-  DataValue* build_id = (DataValue*) getValueByKey(identity, "UniqueBuildID");
+  DataValue* build_id = (DataValue*) dictionary_get_key(identity, "UniqueBuildID");
   if (build_id == NULL) {
     fprintf(stderr, "Unable to find unique build id\n");
     return NULL;
   }
 
-  StringValue* chip_value = (StringValue*) getValueByKey(identity, "ApChipID");
+  StringValue* chip_value = (StringValue*) dictionary_get_key(identity, "ApChipID");
   if (chip_value == NULL) {
     fprintf(stderr, "Unable to find chip id\n");
     return NULL;
@@ -115,7 +115,7 @@ char* createTssRequest(char* ecid_string, char* input_ipsw) {
     sscanf(chip_value->value, "%x", &chip_id);
   }
 
-  StringValue* board_value = (StringValue*) getValueByKey(identity, "ApBoardID");
+  StringValue* board_value = (StringValue*) dictionary_get_key(identity, "ApBoardID");
   if (board_value == NULL) {
     fprintf(stderr, "Unable to find board id\n");
     return NULL;
@@ -124,7 +124,7 @@ char* createTssRequest(char* ecid_string, char* input_ipsw) {
     sscanf(board_value->value, "%x", &board_id);
   }
 
-  StringValue* security_value = (StringValue*) getValueByKey(identity, "ApSecurityDomain");
+  StringValue* security_value = (StringValue*) dictionary_get_key(identity, "ApSecurityDomain");
   if (security_value == NULL) {
     fprintf(stderr, "Unable to find security domain\n");
     return NULL;
@@ -144,20 +144,20 @@ char* createTssRequest(char* ecid_string, char* input_ipsw) {
   }
 
   // Start building the TSS request
-  Dictionary* request = createRoot("<dict></dict>");
-  addStringToDictionary(request, "@HostIpAddress", "192.168.0.1");
-  addStringToDictionary(request, "@HostPlatformInfo", "darwin");
-  addStringToDictionary(request, "@VersionInfo", "3.8");
-  addStringToDictionary(request, "@Locality", "en_US");
-  addBoolToDictionary(request, "ApProductionMode", TRUE);
-  addStringToDictionary(request, "ApECID", ecid);
-  addIntegerToDictionary(request, "ApChipID", chip_id);
-  addIntegerToDictionary(request, "ApBoardID", board_id);
-  addIntegerToDictionary(request, "ApSecurityDomain", security_dom);
-  addDataToDictionary(request, "UniqueBuildID", build_id->value);
+  Dictionary* request = root_from_file("<dict></dict>");
+  dictionary_add_string(request, "@HostIpAddress", "192.168.0.1");
+  dictionary_add_string(request, "@HostPlatformInfo", "darwin");
+  dictionary_add_string(request, "@VersionInfo", "3.8");
+  dictionary_add_string(request, "@Locality", "en_US");
+  dictionary_add_bool(request, "ApProductionMode", TRUE);
+  dictionary_add_string(request, "ApECID", ecid);
+  dictionary_add_integer(request, "ApChipID", chip_id);
+  dictionary_add_integer(request, "ApBoardID", board_id);
+  dictionary_add_integer(request, "ApSecurityDomain", security_dom);
+  dictionary_add_data(request, "UniqueBuildID", build_id->value);
 
   // Add firmware infomation to request
-  Dictionary* manifest = (Dictionary*) getValueByKey(identity, "Manifest");
+  Dictionary* manifest = (Dictionary*) dictionary_get_key(identity, "Manifest");
   if (manifest == NULL) {
     fprintf(stderr, "Unable to find manifest firmware infomation\n");
     return NULL;
@@ -188,11 +188,11 @@ char* createTssRequest(char* ecid_string, char* input_ipsw) {
   free(current);
 
   // Translate dictionary object into xml
-  char* data = getXmlFromRoot(request);
+  char* data = root_to_xml(request);
 
   // Cleanup and return;
-  releaseDictionary(request);
-  releaseDictionary(root);
+  dictionary_free(request);
+  dictionary_free(root);
   releaseOutput(&state);
   free(ecid);
 
@@ -257,7 +257,7 @@ void createTssFirmware(TssResponse* response, const char* input, char* output) {
     return;
   }
 
-  Dictionary* root = createRoot(xml);
+  Dictionary* root = root_from_file(xml);
   if (root == NULL) {
     fprintf(stderr, "Unable to generate root from response xml");
     return;
@@ -274,8 +274,8 @@ void createTssFirmware(TssResponse* response, const char* input, char* output) {
     }
 
     // And that we have the proper values
-    StringValue* path = (StringValue*) getValueByKey(entry, "Path");
-    StringValue* blob = (StringValue*) getValueByKey(entry, "Blob");
+    StringValue* path = (StringValue*) dictionary_get_key(entry, "Path");
+    StringValue* blob = (StringValue*) dictionary_get_key(entry, "Blob");
     if (path == NULL || blob == NULL) {
       fprintf(stderr, "Unable to find the proper values in this entry\n");
       entry = (Dictionary*) entry->dValue.next;
@@ -301,7 +301,7 @@ void createTssFirmware(TssResponse* response, const char* input, char* output) {
   
   writeOutput(&in_state, output);
   releaseOutput(&in_state);
-  releaseDictionary(root);
+  dictionary_free(root);
 }
 
 void replaceImg3Signature(AbstractFile* file, AbstractFile* signature) {

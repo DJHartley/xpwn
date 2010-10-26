@@ -76,10 +76,10 @@ Dictionary* parseIPSW2(const char* inputIPSW, const char* bundleRoot, char** bun
 			plist = (char*) malloc(plistFile->getLength(plistFile));
 			plistFile->read(plistFile, plist, plistFile->getLength(plistFile));
 			plistFile->close(plistFile);
-			info = createRoot(plist);
+			info = root_from_file(plist);
 			free(plist);
 
-			plistSHA1String = (StringValue*)getValueByKey(info, "SHA1");
+			plistSHA1String = (StringValue*)dictionary_get_key(info, "SHA1");
 			if(plistSHA1String) {
 				sscanf(plistSHA1String->value, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
 					&plistHash[0], &plistHash[1], &plistHash[2], &plistHash[3], &plistHash[4],
@@ -102,7 +102,7 @@ Dictionary* parseIPSW2(const char* inputIPSW, const char* bundleRoot, char** bun
 				}
 			}
 
-			releaseDictionary(info);
+			dictionary_free(info);
 		}
 
 		free(infoPath);
@@ -309,13 +309,13 @@ void createRestoreOptions(Volume* volume, int SystemPartitionSize, int UpdateBas
 
 	XLOG(0, "start create restore options\n");
 
-	info = createRoot("<dict></dict>");
-	addBoolToDictionary(info, "CreateFilesystemPartitions", TRUE);
-	addIntegerToDictionary(info, "SystemPartitionSize", SystemPartitionSize);
-	addBoolToDictionary(info, "UpdateBaseband", UpdateBaseband);
+	info = root_from_file("<dict></dict>");
+	dictionary_add_bool(info, "CreateFilesystemPartitions", TRUE);
+	dictionary_add_integer(info, "SystemPartitionSize", SystemPartitionSize);
+	dictionary_add_bool(info, "UpdateBaseband", UpdateBaseband);
 
-	plist = getXmlFromRoot(info);
-	releaseDictionary(info);
+	plist = root_to_xml(info);
+	dictionary_free(info);
 	
 	XLOG(0, "%s", plist);
 
@@ -340,35 +340,35 @@ void fixupBootNeuterArgs(Volume* volume, char unlockBaseband, char selfDestruct,
 	plistFile = createAbstractFileFromMemoryFile((void**)&plist, &bufferSize);
 	get_hfs(volume, bootNeuterPlist, plistFile);	
 	plistFile->close(plistFile);
-	info = createRoot(plist);
+	info = root_from_file(plist);
 	free(plist);
 
-	arguments = (ArrayValue*) getValueByKey(info, "ProgramArguments");
-	addStringToArray(arguments, "-autoMode");
-	addStringToArray(arguments, "YES");
-	addStringToArray(arguments, "-RegisterForSystemEvents");
-	addStringToArray(arguments, "YES");
+	arguments = (ArrayValue*) dictionary_get_key(info, "ProgramArguments");
+	array_add_string(arguments, "-autoMode");
+	array_add_string(arguments, "YES");
+	array_add_string(arguments, "-RegisterForSystemEvents");
+	array_add_string(arguments, "YES");
 	
 	if(unlockBaseband) {
-		addStringToArray(arguments, "-unlockBaseband");
-		addStringToArray(arguments, "YES");
+		array_add_string(arguments, "-unlockBaseband");
+		array_add_string(arguments, "YES");
 	}
 	
 	if(selfDestruct) {
-		addStringToArray(arguments, "-selfDestruct");
-		addStringToArray(arguments, "YES");
+		array_add_string(arguments, "-selfDestruct");
+		array_add_string(arguments, "YES");
 	}
 	
 	if(use39) {
-		addStringToArray(arguments, "-bootLoader");
-		addStringToArray(arguments, "3.9");
+		array_add_string(arguments, "-bootLoader");
+		array_add_string(arguments, "3.9");
 	} else if(use46) {
-		addStringToArray(arguments, "-bootLoader");
-		addStringToArray(arguments, "4.6");
+		array_add_string(arguments, "-bootLoader");
+		array_add_string(arguments, "4.6");
 	}
 	
-	plist = getXmlFromRoot(info);
-	releaseDictionary(info);
+	plist = root_to_xml(info);
+	dictionary_free(info);
 	
 	plistFile = createAbstractFileFromMemory((void**)&plist, sizeof(char) * strlen(plist));
 	add_hfs(volume, plistFile, bootNeuterPlist);

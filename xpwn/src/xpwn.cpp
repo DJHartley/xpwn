@@ -107,15 +107,15 @@ int main(int argc, char *argv[])
 	io_func* myRamdisk = IOFuncFromAbstractFile(createAbstractFileFromMemoryFile(&buffer, &bufferSize));
 	Volume* ramdiskVolume = openVolume(myRamdisk);
 
-	Dictionary* ibootDict = (Dictionary*)getValueByKey((Dictionary*)getValueByKey(info, "FirmwarePatches"), "iBoot");
+	Dictionary* ibootDict = (Dictionary*)dictionary_get_key((Dictionary*)dictionary_get_key(info, "FirmwarePatches"), "iBoot");
 	if(!ibootDict) {
 		cout << "Error reading iBoot info" << endl;
 		exit(1);
 	}
 
 	if(!iboot) {
-		add_hfs(ramdiskVolume, getFileFromOutputState(&ipswContents, ((StringValue*)getValueByKey(ibootDict, "File"))->value), "/ipwner/iboot.img2");
-		StringValue* patchValue = (StringValue*) getValueByKey(ibootDict, "Patch");
+		add_hfs(ramdiskVolume, getFileFromOutputState(&ipswContents, ((StringValue*)dictionary_get_key(ibootDict, "File"))->value), "/ipwner/iboot.img2");
+		StringValue* patchValue = (StringValue*) dictionary_get_key(ibootDict, "Patch");
 		char* patchPath = (char*) malloc(sizeof(char) * (strlen(bundlePath) + strlen(patchValue->value) + 2));
 		strcpy(patchPath, bundlePath);
 		strcat(patchPath, "/");
@@ -136,14 +136,14 @@ int main(int argc, char *argv[])
 		size_t imageSize;
 
 		if(applelogo) {
-			fileValue = (StringValue*) getValueByKey((Dictionary*)getValueByKey((Dictionary*)getValueByKey(info, "FirmwarePatches"), "AppleLogo"), "File");
+			fileValue = (StringValue*) dictionary_get_key((Dictionary*)dictionary_get_key((Dictionary*)dictionary_get_key(info, "FirmwarePatches"), "AppleLogo"), "File");
 			printf("replacing %s\n", fileValue->value); fflush(stdout);
 			ASSERT((imageBuffer = replaceBootImage(getFileFromOutputState(&ipswContents, fileValue->value), NULL, NULL, applelogo, &imageSize)) != NULL, "failed to use new image");
 			add_hfs(ramdiskVolume, createAbstractFileFromMemory(&imageBuffer, imageSize), "/ipwner/logo.img2");
 		}
 
 		if(recoverymode) {
-			fileValue = (StringValue*) getValueByKey((Dictionary*)getValueByKey((Dictionary*)getValueByKey(info, "FirmwarePatches"), "RecoveryMode"), "File");
+			fileValue = (StringValue*) dictionary_get_key((Dictionary*)dictionary_get_key((Dictionary*)dictionary_get_key(info, "FirmwarePatches"), "RecoveryMode"), "File");
 			printf("replacing %s\n", fileValue->value); fflush(stdout);
 			ASSERT((imageBuffer = replaceBootImage(getFileFromOutputState(&ipswContents, fileValue->value), NULL, NULL, recoverymode, &imageSize)) != NULL, "failed to use new image");
 			add_hfs(ramdiskVolume, createAbstractFileFromMemory(&imageBuffer, imageSize), "/ipwner/recovery.img2");			
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
 
 	ramdisk = createAbstractFileFromMemoryFile(&buffer, &bufferSize);
 
-	kernelValue = (StringValue*) getValueByKey((Dictionary*)getValueByKey((Dictionary*)getValueByKey(info, "FirmwarePatches"), "KernelCache"), "File");
+	kernelValue = (StringValue*) dictionary_get_key((Dictionary*)dictionary_get_key((Dictionary*)dictionary_get_key(info, "FirmwarePatches"), "KernelCache"), "File");
 	if(!kernelValue) {
 		cout << "Unable to determine kernel cache file name from bundle plist!";
 		return 1;
@@ -289,7 +289,7 @@ int main(int argc, char *argv[])
 	}
 
 	releaseOutput(&ipswContents);
-	releaseDictionary(info);
+	dictionary_free(info);
 	free(bundlePath);
 
 	return 0;
