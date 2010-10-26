@@ -26,15 +26,11 @@ user interfaces will be developed for it eventually, it's mostly meant to be
 a toy for *nix geeks. Absolutely no support should be expected or will be
 given.
 
-XPwn is also NOT winpwn. Winpwn will have things like easy package management,
-an actual, non-lame system of installing stuff. I've seen the code for it, and
-it will be pretty awesome when finished. Those tasks are outside the scope of
-XPwn.
 
 Credits
 -------
 
-This utility is merely an implementation of Pwnage, which is the work of
+This utility is implementation of Pwnage, which is the work of
 roxfan, Turbo, wizdaz, bgm, and pumpkin. Those guys are the real heroes.
 
 Also, the new super-awesome bootrom exploit is courtesy of wizdaz.
@@ -58,8 +54,6 @@ Turbo.
 XPwn on Linux would not have been possible without libibooter, which was
 written by cmw, based on the Linux iPhone recovery driver written by geohot.
 
-Dripwn was created by Munnerz, specifically for installing iDroid.
-
 A special shout-out to cmw, who I have been helping with winpwn. He's put a
 lot of hard work into winpwn, and should also be credited with doing some of
 the initial exploratory work with the undocumented DMG format.
@@ -72,7 +66,7 @@ FirmwareBundles folders from PwnageTool, and Turbo's autopwn ramdisk.
 
 *NOTE: Img3 decoding has been changed in newer firmwares (>= 3.1). Backwards
 compatibility with older firmwares is achieved by passing "--old-img3-decrypt"
-to idevice, imagetool, ipsw, xpwntool.*
+to imagetool, ipsw, xpwntool.*
 
 ## Overview
 
@@ -87,9 +81,6 @@ It is technically possible to skip itunespwn and just use idevice or skip
 idevice and just use itunespwn, but I recommend doing both.
 
 ## ipsw
-
-*NOTE: Important change for 2.0: (uncompressed) tarballs rather than paths are
-now used for bundles*
 
 ipsw is a more complex tool to generate custom IPSWs that you can restore
 after using xpwn (or any other pwnage-based utility). This is important, since
@@ -145,131 +136,6 @@ future.
 
 Told you it was a mess.
 
-## itunespwn
-
-This *Windows* utility will replace a file in your %APPDATA%\Apple Computer\
-Device Support folder. Subsequently, if you place your phone into DFU mode
-and iTunes recognizes it, Apple will automatically upload an exploit file onto
-your phone that will allow it to accept custom firmware (until it is turned
-off). This basically will allow you to restore any IPSW you want from that
-version of iTunes (provided you connect your phone in DFU mode).
-
-See the following section for detailed instructions on how to enter DFU mode.
-
-Usage:
-
-	itunespwn <custom.ipsw>
-
-The custom.ipsw is needed for the exploited WTF that was generated during
-IPSW generation.
-
-## idevice
-
-This utility replaces dfu-util for Windows, sidestepping the libusb
-requirement and provides a more user-friendly way of guiding them through
-DFU mode. Its arguments are analogous to dfu-util and more details can be
-read in that section. The difference is that iTunes' libraries are used
-rather than the non-proprietary dfu-util. Also, a user-friendly logo is
-made to appear on the iPhone upon successful completion, so an unambiguous
-cue can be given to the user that they are ready to use the IPSW they created.
-
-Obviously, a CLI is by its very nature not very newbie friendly, so the
-primary purpose of this utility is to serve a mock-up for GUI implementors.
-All GUI implementors are *strongly encouraged* to reproduce this in their
-applications.
-
-Usage:
-
-	idevice <custom.ipsw> <n82ap|m68ap|n45ap>
-
-
-## dfu-util (Not recommended on Windows)
-
-dfu-util is an utility adapted from OpenMoko that satisfies the "pwning" stage
-of the process, that is, allowing the execution of our unsigned code. It
-relies upon an exploit in the DFU mode of the iPhone/iPod touch bootrom. This
-cannot be fixed by Apple on the current hardware revisions. If we can mess
-with the device before iTunes sees it, we can have it load a WTF with
-signature checking disabled with the exploit, and load an iBSS with signature
-checking disabled over that WTF. iTunes will see the device as a regular
-iPhone/iPod in recovery mode, and will happily send our custom firmware to it,
-which will now be accepted.
-
-YOU MUST COMPLETELY DISABLE iTUNES WITH TASK MANAGER OR EQUIVALENT BEFORE
-PROCEEDING.
-
-Only AFTERWARDS do you put your device into DFU mode. If you switch the order
-of these steps, iTunes will be able to load software onto your device without
-this vulnerability, rendering dfu-util useless.
-
-AFTER you have disabled iTunes, iTunesHelper, etc., plug your device
-into the computer. Shut down the device in the normal way if necessary
-(Slide to shutdown). Hold down the Power and Home buttons simultaneously
-and count slowly to ten. (You may need to push down on power an instant
-before you push down on home). The iPhone will start. At around the time
-you count to 6, the iPhone will shut down again. KEEP HOLDING BOTH
-BUTTONS. Hold down both buttons until you reach 10. At this point,
-release the power button ONLY.  Keep holding the stand-by button forever
-(this may take up to two minutes). Note Windows: You will know when you
-can stop holding the button when Windows notifies you via an audible
-cue that a USB device has connected. Note Linux: In terms of Linux you
-could do lsusb until it's seen. dfu-util is gradually being phased out
-anyway. This is your device in DFU mode. The screen of the device will
-remain completely powered off.
-
-THEN, run dfu-util with the following syntax:
-
-	sudo ./dfu-util <custom.ipsw> <n82ap|m68ap|n45ap>
-
-Where n82ap = 3G iPhone, m68ap = First-generation iPhone, n45ap = iPod touch.
-Note that you're using your CUSTOM IPSW for this stage, since we will need the
-patched firmware, not the stock firmware. dfu-util will pick out the right
-files from the ipsw and send them in the right order. If your screen powers on
-and then turns white, then you know it worked. You can now restore with iTunes.
-
-## xpwn *(DEPRECATED)*
-
-If DFU mode is too complicated for you, and you have a first-generation phone,
-you can still use the legacy xpwn ramdisk method on 1.1.4 to pwn your phone.
-Then you can restore the custom IPSW without messing with DFU mode.
-
-xpwn will use libibooter to bootstrap the autopwn ramdisk. This will patch
-NOR so that unsigned IPSWs can subsequently be used. The vulnerability used
-is only available in firmware version 1.1.4, so this step has to be done with
-that version.
-
-	./xpwn <input.ipsw> [-b <bootlogo.png>] [-r <recoverylogo.png>]
-
-Specifying a boot logo and a recovery logo is optional. You can specify both,
-or just one. If you do not specify a particular boot logo, the logo will
-remain the same as the one you currently have.
-
-The input IPSW should correspond with CURRENT version on the device you are
-trying to jailbreak. NOT the one you want to upgrade to. The reason it is
-necessary is to provide a kernel for the ramdisk to boot and to provide
-template boot logos to replace.
-
-Note that the input IPSW must have the same name as the one on Apple's
-download site! That is, it will not be recognized if you have renamed it after
-downloading it.
-
-*Note that xpwn is not currently known to work for firmware other than 1.1.4.*
-
-The boot and recovery logos need to be PNG formatted files that less than or
-equal to 320x480 in dimension. Although automatic conversion will be attempted
-for you, the preferred format is an ARGB PNG with 8 bits per channel. *NOT* a
-paletted RGB, and an alpha channel must be present *NOT* binary transparency.
-
-If you save in PNG-24 and have at least one semi-transparent (not fully
-transparent) pixel in your file, you ought to be in good shape.
-
-It is safe to use xpwn multiple times consecutively, and that method can be
-used to swap boot logos without restoring.
-
-A restore with a non-customized IPSW will undo what xpwn did (the NOR will be
-reflashed with Apple's image that does have signature checking)
-
-
 ### Examples
 
 Jailbreaking iPod 2.0:
@@ -293,14 +159,14 @@ Jailbreaking, activating, and unlocking iPhone 2.0:
 Technical notes
 ---------------
 
-Both xpwn and ipsw load the entire contents of the IPSW into memory before
-manipulating it. This is especially useful for ipsw, because it allows all the
+The ipsw tool loads the entire contents of the IPSW into memory before
+manipulating it. This is especially useful, because it allows all the
 necessary transformations to be done without writing the intermediate steps to
 disk and slowing the process down. ipsw is hence even faster than the Mac
 pwnagetool.
 
-However, hefty virtual memory requirements are necessary: 170 MB for xpwn and
-500 MB for ipsw. Most modern computers should have that much to spare. Not all
+However, hefty virtual memory requirements are necessary: 500 MB for the ipsw 
+tool. Most modern computers should have that much to spare. Not all
 of it needs to be free physical, as memory is accessed in a sequential manner
 so thrashing should be kept to a minimum. In the worst case, it should be
 equivalent to just writing intermediate results to disk. In essence, virtual
@@ -329,7 +195,6 @@ Linux Notes:
 ------------
 Question: Is there a way to restore the iPhone from Linux?
 
-Answer: There is currently no way to restore an IPSW directly from
-Linux. The necessary reverse-engineering has already been done by
-pumpkin, bushing and c1de0x, so that functionality will come in the
-medium-term future.
+Answer: There is posixninja's "idevicerestore", but it currently isn't in a fully
+usable state. You can check it out, though.
+
