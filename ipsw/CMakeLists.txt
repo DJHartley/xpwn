@@ -46,59 +46,44 @@ IF(HAVE_HW_CRYPTO)
 	add_definitions(-DHAVE_HW_CRYPTO)
 ENDIF(HAVE_HW_CRYPTO)
 
-add_library(xpwn 8900.c bspatch.c ibootim.c img2.c img3.c libxpwn.c lzss.c lzssfile.c nor_files.c outputstate.c plist.c pwnutil.c)
+add_library(ipsw 8900.c bspatch.c ibootim.c img2.c img3.c libxpwn.c lzss.c lzssfile.c nor_files.c outputstate.c pwnutil.c)
 
 IF(HAVE_HW_CRYPTO)
-	target_link_libraries(xpwn IOKit)
+	target_link_libraries(ipsw IOKit)
 ENDIF(HAVE_HW_CRYPTO)
 
-target_link_libraries(xpwn dmg hfs common minizip ${CRYPTO_LIBRARIES} ${BZIP2_LIBRARIES} ${PNG_LIBRARIES} m)
+target_link_libraries(ipsw dmg hfs common minizip plist ${CRYPTO_LIBRARIES} ${BZIP2_LIBRARIES} ${PNG_LIBRARIES} m)
 
 IF(NOT APPLE)
-	target_link_libraries(xpwn ${ZLIB_LIBRARIES})
+	target_link_libraries(ipsw ${ZLIB_LIBRARIES})
 ENDIF(NOT APPLE)
 
 IF(APPLE)
-	ADD_CUSTOM_TARGET(libXPwn.a
-		COMMAND powerpc-apple-darwin8-libtool -static -o libXPwn.a
+	ADD_CUSTOM_TARGET(libxpwn.a
+		COMMAND powerpc-apple-darwin8-libtool -static -o libxpwn.a
 			${PROJECT_BINARY_DIR}/ipsw-patch/libxpwn.a ${PROJECT_BINARY_DIR}/minizip/libminizip.a
 			${PROJECT_BINARY_DIR}/common/libcommon.a ${PROJECT_BINARY_DIR}/hfs/libhfs.a 
+			${PROJECT_BINARY_DIR}/plist/plist.a
 			${PROJECT_BINARY_DIR}/dmg/libdmg.a ${PNG_LIBRARIES} ${BZIP2_LIBRARIES}
 			${CRYPTO_LIBRARIES}
-		DEPENDS xpwn dmg hfs common minizip)
+		DEPENDS ipsw dmg hfs common minizip)
 ELSE(APPLE)
-	ADD_CUSTOM_TARGET(libXPwn.a
+	ADD_CUSTOM_TARGET(libxpwn.a
 		COMMAND ${CMAKE_C_COMPILER} ${CMAKE_C_FLAGS}
 			-L${PROJECT_BINARY_DIR}/ipsw-patch -L${PROJECT_BINARY_DIR}/dmg -L${PROJECT_BINARY_DIR}/hfs
 			-L${PROJECT_BINARY_DIR}/hfs -L${PROJECT_BINARY_DIR}/minizip -L${PROJECT_BINARY_DIR}/common
-			-Xlinker --whole-archive -lxpwn -ldmg -lhfs -lcommon -lminizip
+			-L${PROJECT_BINARY_DIR}/plist
+			-Xlinker --whole-archive -lipsw -ldmg -lhfs -lcommon -lminizip -lplist
 			${CRYPTO_LIBRARIES} ${BZIP2_LIBRARIES} ${PNG_LIBRARIES}
 			-Xlinker --unresolved-symbols=ignore-all -Xlinker -r -nostdlib -o libXPwn.o
-		COMMAND ${CMAKE_AR} cr libXPwn.a libXPwn.o
-		COMMAND ${CMAKE_RANLIB} libXPwn.a
-		DEPENDS xpwn dmg hfs common minizip)
+		COMMAND ${CMAKE_AR} cr libxpwn.a libxpwn.o
+		COMMAND ${CMAKE_RANLIB} libxpwn.a
+		DEPENDS ipsw dmg hfs common minizip)
 ENDIF(APPLE)
 
 IF(WIN32)
-	TARGET_LINK_LIBRARIES(xpwn gdi32)
+	TARGET_LINK_LIBRARIES(ipsw gdi32)
 ENDIF(WIN32)
 
-add_executable(ipsw main.c)
-target_link_libraries(ipsw xpwn)
 
-add_executable(xpwntool xpwntool.c)
-target_link_libraries(xpwntool xpwn)
-
-add_executable(imagetool imagetool.c)
-target_link_libraries(imagetool xpwn)
-
-IF(WIN32)
-	ADD_EXECUTABLE(itunespwn itunespwn.c)
-	TARGET_LINK_LIBRARIES(itunespwn xpwn gdi32)
-	install(TARGETS itunespwn RUNTIME DESTINATION .)
-ENDIF(WIN32)
-
-install(TARGETS ipsw xpwntool RUNTIME DESTINATION .)
-install(DIRECTORY FirmwareBundles/ DESTINATION FirmwareBundles)
-install(DIRECTORY bundles/ DESTINATION bundles)
 

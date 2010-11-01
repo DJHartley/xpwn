@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-project (XPwn)
+project (xpwn)
 
 # We want win32 executables to build staticly by default, since it's more difficult to keep the shared libraries straight on Windows
 IF(WIN32)
@@ -22,6 +22,7 @@ add_subdirectory (dmg)
 add_subdirectory (hfs)
 add_subdirectory (ipsw)
 add_subdirectory (tools)
+add_subdirectory (resources)
 
 install(FILES README.markdown DESTINATION . RENAME README.txt)
 install(FILES LICENSE DESTINATION . RENAME LICENSE.txt)
@@ -32,17 +33,20 @@ ELSE(WIN32 OR APPLE)
 	SET(CPACK_GENERATOR "TBZ2")
 ENDIF(WIN32 OR APPLE)
 
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "XPwn")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "xpwn")
 SET(CPACK_PACKAGE_VENDOR "iPhone Dev Team")
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.markdown")
 SET(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/README.markdown")
 SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
 SET(CPACK_PACKAGE_VERSION_MAJOR "0")
-SET(CPACK_PACKAGE_VERSION_MINOR "5")
-SET(CPACK_PACKAGE_VERSION_PATCH "8")
-SET(CPACK_PACKAGE_EXECUTABLES "xpwn-ipsw" "Apple IPSW utility")
-SET(CPACK_PACKAGE_EXECUTABLES "xpwn-hdutil" "Apple disk image utility")
-SET(CPACK_PACKAGE_EXECUTABLES "xpwn-dmg" "Apple DMG utility")
-SET(CPACK_PACKAGE_EXECUTABLES "xpwn-hfs" "Apple HFS+ utility")
+SET(CPACK_PACKAGE_VERSION_MINOR "6")
+SET(CPACK_PACKAGE_VERSION_PATCH "0")
+
+SET(CPACK_PACKAGE_EXECUTABLES "ipswtool" "Apple IPSW utility")
+SET(CPACK_PACKAGE_EXECUTABLES "hdutil" "Apple disk image utility")
+SET(CPACK_PACKAGE_EXECUTABLES "dmgtool" "Apple DMG utility")
+SET(CPACK_PACKAGE_EXECUTABLES "hfstool" "Apple HFS+ utility")
+SET(CPACK_PACKAGE_EXECUTABLES "imagetool" "Apple boot image utility")
+
 INCLUDE(CPack)
 

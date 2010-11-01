@@ -1,2 +1,0 @@
-/usr/bin/ar cr libxpwn.a  CMakeFiles/xpwn.dir/8900.c.o CMakeFiles/xpwn.dir/bspatch.c.o CMakeFiles/xpwn.dir/ibootim.c.o CMakeFiles/xpwn.dir/img2.c.o CMakeFiles/xpwn.dir/img3.c.o CMakeFiles/xpwn.dir/libxpwn.c.o CMakeFiles/xpwn.dir/lzss.c.o CMakeFiles/xpwn.dir/lzssfile.c.o CMakeFiles/xpwn.dir/nor_files.c.o CMakeFiles/xpwn.dir/outputstate.c.o CMakeFiles/xpwn.dir/plist.c.o CMakeFiles/xpwn.dir/pwnutil.c.o
-/usr/bin/ranlib libxpwn.a
